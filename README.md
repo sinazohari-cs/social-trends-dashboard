@@ -2,7 +2,8 @@
 
 A real-time web dashboard built with React and Recharts that surfaces trending topics from Hacker News, filtered by category with live score data.
 
-**Live demo:** [your-username.github.io/social-trends-dashboard](https://your-username.github.io/social-trends-dashboard)
+**Live demo:** [sinazohari-cs
+.github.io/social-trends-dashboard](https://your-username.github.io/social-trends-dashboard)
 
 ## What it does
 
