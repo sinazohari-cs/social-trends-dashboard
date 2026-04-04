@@ -3,7 +3,7 @@
 A real-time web dashboard built with React and Recharts that surfaces trending topics from Hacker News, filtered by category with live score data.
 
 **Live demo:** [sinazohari-cs
-.github.io/social-trends-dashboard](https://your-username.github.io/social-trends-dashboard)
+.github.io/social-trends-dashboard](https://sinazohari-cs.github.io/social-trends-dashboard)
 
 ## What it does
 
@@ -37,7 +37,7 @@ open index.html   # or double-click it
 1. Push this repo to GitHub
 2. Go to **Settings → Pages**
 3. Set source to `main` branch, `/ (root)` folder
-4. Click **Save** — your site will be live at `https://your-username.github.io/social-trends-dashboard`
+4. Click **Save** — your site will be live at `https://sinazohari-cs.github.io/social-trends-dashboard`
 
 ## API
 
