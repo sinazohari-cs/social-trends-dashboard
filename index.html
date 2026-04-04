@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social Trends Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.7/Recharts.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f11;
+      --surface: #18181c;
+      --border: rgba(255,255,255,0.08);
+      --text: #f0eff4;
+      --muted: #9998a8;
+      --dim: #555468;
+      --accent: #7f77dd;
+      --green: #1d9e75;
+      --amber: #ef9f27;
+      --red: #e24b4a;
+      --blue: #378add;
+      --coral: #d85a30;
+      --pink: #d4537e;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .logo span { color: var(--accent); }
+
+    .live {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    main { padding: 1.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric-sub { font-size: 11px; color: var(--dim); margin-top: 4px; }
+
+    .filters {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    .filter-btn {
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover { background: var(--surface); color: var(--text); }
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 680px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 1rem;
+    }
+
+    .story {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .story:last-child { border-bottom: none; }
+
+    .score {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      min-width: 38px;
+      font-variant-numeric: tabular-nums;
+      padding-top: 1px;
+    }
+
+    .story-title {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.4;
+      margin-bottom: 4px;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+
+    .story-title:hover { color: var(--accent); }
+
+    .story-meta { font-size: 11px; color: var(--dim); display: flex; align-items: center; gap: 6px; }
+
+    .tag {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--muted);
+      font-size: 14px;
+      grid-column: 1 / -1;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .recharts-cartesian-axis-tick text { fill: var(--dim) !important; }
+    .recharts-tooltip-wrapper { outline: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Social <span>Trends</span> Dashboard</div>
+  <div class="live" id="ts-header">
+    <span class="dot"></span>
+    <span id="timestamp">Loading...</span>
+  </div>
+</header>
+
+<main>
+  <div class="metrics" id="metrics">
+    <div class="loading"><span class="spinner"></span>Fetching live data...</div>
+  </div>
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="grid">
+    <div class="loading"><span class="spinner"></span>Building visualizations...</div>
+  </div>
+</main>
+
+<script>
+const CATS = {
+  AI: ['ai','gpt','llm','machine learning','neural','openai','anthropic','gemini','model','artificial','claude'],
+  Web: ['react','javascript','typescript','css','html','frontend','browser','web','node','http','wasm'],
+  Science: ['science','physics','biology','climate','space','nasa','quantum','research','study','math'],
+  Security: ['security','hack','vulnerability','breach','privacy','crypto','auth','exploit','ransomware'],
+  Startup: ['startup','founder','vc','funding','raise','acquisition','ipo','series','y combinator'],
+  Career: ['job','hiring','work','remote','salary','layoff','career','engineer','developer'],
+};
+
+const CAT_COLORS = {
+  AI: '#7f77dd', Web: '#1d9e75', Science: '#ef9f27',
+  Security: '#d85a30', Startup: '#d4537e', Career: '#378add', Other: '#888780'
+};
+
+let allStories = [], activeFilter = 'All';
+
+function categorize(title) {
+  const t = title.toLowerCase();
+  for (const [cat, kws] of Object.entries(CATS)) {
+    if (kws.some(k => t.includes(k))) return cat;
+  }
+  return 'Other';
+}
+
+async function fetchStory(id) {
+  const r = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
+  return r.json();
+}
+
+async function load() {
+  const ids = await (await fetch('https://hacker-news.firebaseio.com/v0/topstories.json')).json();
+  const stories = await Promise.all(ids.slice(0, 50).map(fetchStory));
+  allStories = stories
+    .filter(s => s && s.title && s.score)
+    .sort((a, b) => b.score - a.score);
+  allStories.forEach(s => {
+    s.cat = categorize(s.title);
+    try { s.domain = s.url ? new URL(s.url).hostname.replace('www.', '') : null; } catch { s.domain = null; }
+  });
+  render();
+}
+
+function render() {
+  const filtered = activeFilter === 'All'
+    ? allStories
+    : allStories.filter(s => s.cat === activeFilter);
+
+  // timestamp
+  document.getElementById('timestamp').textContent =
+    'Live · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  // metrics
+  const avgScore = Math.round(filtered.reduce((a, s) => a + s.score, 0) / (filtered.length || 1));
+  const domainMap = filtered.reduce((acc, s) => {
+    if (s.domain) acc[s.domain] = (acc[s.domain] || 0) + 1;
+    return acc;
+  }, {});
+  const topDomain = Object.entries(domainMap).sort((a, b) => b[1] - a[1])[0];
+  const topCat = Object.entries(
+    filtered.reduce((acc, s) => { acc[s.cat] = (acc[s.cat] || 0) + 1; return acc; }, {})
+  ).sort((a, b) => b[1] - a[1])[0];
+
+  document.getElementById('metrics').innerHTML = `
+    <div class="metric">
+      <div class="metric-label">Stories tracked</div>
+      <div class="metric-value">${filtered.length}</div>
+      <div class="metric-sub">from HN top 50</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Avg score</div>
+      <div class="metric-value">${avgScore}</div>
+      <div class="metric-sub">points per story</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Top source</div>
+      <div class="metric-value" style="font-size:15px;padding-top:6px">${topDomain ? topDomain[0] : '—'}</div>
+      <div class="metric-sub">${topDomain ? topDomain[1] + ' stories' : ''}</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Trending category</div>
+      <div class="metric-value" style="font-size:15px;padding-top:6px;color:${topCat ? CAT_COLORS[topCat[0]] : '#fff'}">${topCat ? topCat[0] : '—'}</div>
+      <div class="metric-sub">${topCat ? topCat[1] + ' stories' : ''}</div>
+    </div>
+  `;
+
+  // filters
+  const cats = ['All', ...Object.keys(CATS), 'Other'];
+  document.getElementById('filters').innerHTML = cats.map(c =>
+    `<button class="filter-btn${activeFilter === c ? ' active' : ''}" onclick="setFilter('${c}')">${c}</button>`
+  ).join('');
+
+  // chart data
+  const catCounts = [...Object.keys(CATS), 'Other']
+    .map(cat => ({ name: cat, count: filtered.filter(s => s.cat === cat).length, fill: CAT_COLORS[cat] }))
+    .filter(c => c.count > 0);
+
+  // top stories
+  const top10 = filtered.slice(0, 10);
+
+  document.getElementById('grid').innerHTML = `
+    <div class="card">
+      <div class="card-title">Category breakdown</div>
+      <div id="chart-mount" style="height:200px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Top stories · sorted by score</div>
+      ${top10.map(s => `
+        <div class="story">
+          <div class="score">${s.score}</div>
+          <div>
+            <div class="story-title" onclick="openStory('${s.url || `https://news.ycombinator.com/item?id=${s.id}`}')">${s.title}</div>
+            <div class="story-meta">
+              <span class="tag" style="background:${CAT_COLORS[s.cat]}22;color:${CAT_COLORS[s.cat]}">${s.cat}</span>
+              ${s.domain || 'news.ycombinator.com'}
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>
+  `;
+
+  // recharts bar chart
+  const { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } = Recharts;
+  const el = document.getElementById('chart-mount');
+  if (el) {
+    ReactDOM.render(
+      React.createElement(ResponsiveContainer, { width: '100%', height: 200 },
+        React.createElement(BarChart, { data: catCounts, margin: { top: 4, right: 8, left: -20, bottom: 4 } },
+          React.createElement(XAxis, { dataKey: 'name', tick: { fontSize: 10, fill: '#555468' }, axisLine: false, tickLine: false }),
+          React.createElement(YAxis, { tick: { fontSize: 10, fill: '#555468' }, axisLine: false, tickLine: false }),
+          React.createElement(Tooltip, {
+            contentStyle: { background: '#18181c', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '12px' },
+            labelStyle: { color: '#f0eff4' },
+            cursor: { fill: 'rgba(255,255,255,0.04)' }
+          }),
+          React.createElement(Bar, { dataKey: 'count', radius: [4, 4, 0, 0] },
+            catCounts.map((c, i) => React.createElement(Cell, { key: i, fill: c.fill }))
+          )
+        )
+      ), el
+    );
+  }
+}
+
+function setFilter(f) { activeFilter = f; render(); }
+function openStory(url) { window.open(url, '_blank'); }
+
+load().catch(err => {
+  document.getElementById('metrics').innerHTML = `<div class="loading">Failed to load data. Check your connection and try refreshing.</div>`;
+  console.error(err);
+});
+</script>
+</body>
+</html>
