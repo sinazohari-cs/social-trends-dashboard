@@ -37,7 +37,7 @@ open index.html   # or double-click it
 1. Push this repo to GitHub
 2. Go to **Settings → Pages**
 3. Set source to `main` branch, `/ (root)` folder
-4. Click **Save** — your site will be live at `https://sinazohari-cs.github.io/social-trends-dashboard`
+4. Click **Save** — your site will be live at `https://yourUserName.github.io/social-trends-dashboard`
 
 ## API
 
