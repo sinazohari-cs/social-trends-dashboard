@@ -32,13 +32,6 @@ cd social-trends-dashboard
 open index.html   # or double-click it
 ```
 
-## How to deploy to GitHub Pages
-
-1. Push this repo to GitHub
-2. Go to **Settings → Pages**
-3. Set source to `main` branch, `/ (root)` folder
-4. Click **Save** — your site will be live at `https://yourUserName.github.io/social-trends-dashboard`
-
 ## API
 
 This project uses the [Hacker News API](https://github.com/HackerNews/API) — a free, public Firebase REST API:
@@ -56,11 +49,3 @@ No API key required. No rate limiting for reasonable usage.
 social-trends-dashboard/
 └── index.html     # entire app in one file (HTML + CSS + JS)
 ```
-
-## Future improvements
-
-- Add Reddit API integration for broader social trend coverage
-- Keyword search across story titles
-- Sort by comments count vs. score
-- Save bookmarked stories to localStorage
-- Dark/light mode toggle
